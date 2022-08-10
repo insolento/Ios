@@ -18,7 +18,7 @@ class LogInViewController: UIViewController {
         return view
     }()
     
-    let profile: UIViewController = ProfileViewController()
+    //let profile: UIViewController = ProfileViewController(fullName: "Hipster Cat", userService: hipsterCat)
     
     let logoView: UIView = {
         let logoView = UIView()
@@ -115,6 +115,8 @@ class LogInViewController: UIViewController {
 // Вариант с проверкой на ввод, оставлю закоменченным
     
     @objc func logIn() {
+        print(login.text)
+        let profile: UIViewController = ProfileViewController(fullName: login.text ?? "", userService: hipsterCat)
         self.navigationController?.pushViewController(profile, animated: true)
     }
     
