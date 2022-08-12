@@ -83,7 +83,7 @@ class ProfileViewController: UIViewController {
     }
     
     func headerViewSetup() {
-        var currentUser: User = userService.findUser(userName: fullName)
+        let currentUser: User = userService.findUser(userName: fullName)
         headerView.hipsterCat.text = currentUser.fullName
         headerView.catImageView.layer.contents = currentUser.profileImage.cgImage
         headerView.statusTextField.text = currentUser.status

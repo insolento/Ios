@@ -115,8 +115,11 @@ class LogInViewController: UIViewController {
 // Вариант с проверкой на ввод, оставлю закоменченным
     
     @objc func logIn() {
-        print(login.text)
-        let profile: UIViewController = ProfileViewController(fullName: login.text ?? "", userService: hipsterCat)
+        #if DEBUG
+        let profile: UIViewController = ProfileViewController(fullName: CurrentHipsterCat.user.fullName, userService: CurrentHipsterCat)
+        #else
+        let profile: UIViewController = ProfileViewController(fullName: TestUserService.user.fullName, userService: TestUserService)
+        #endif
         self.navigationController?.pushViewController(profile, animated: true)
     }
     
