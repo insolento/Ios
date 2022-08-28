@@ -1,8 +1,17 @@
-//
-//  LoginFactory.swift
-//  Navigation
-//
-//  Created by мак on 28.08.2022.
-//
-
 import Foundation
+import UIKit
+
+protocol LoginFactory {
+    
+    func makeLoginInspector() -> LoginInspector
+    
+}
+
+struct MyLoginFactory: LoginFactory {
+    func makeLoginInspector() -> LoginInspector {
+        let loginInspector = LoginInspector()
+        return loginInspector
+    }
+    
+    
+}

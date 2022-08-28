@@ -1,8 +1,20 @@
-//
-//  Checker.swift
-//  Navigation
-//
-//  Created by мак on 28.08.2022.
-//
+import UIKit
 
-import Foundation
+class Checker {
+    
+    private let password = "1234"
+    private let login = "Hypster Cat"
+    
+    func check(loginEntered: String, passwordEntered: String) -> Bool {
+        if loginEntered == login && passwordEntered == password {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
+protocol LoginViewControllerDelegate {
+    func check(loginEntered: String, passwordEntered: String) -> Bool
+    func dance()
+}
