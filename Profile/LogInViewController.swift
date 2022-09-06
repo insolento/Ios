@@ -127,7 +127,6 @@ class LogInViewController: UIViewController {
     
     @objc func logIn() {
         let checkResults = loginDelegate?.check(loginEntered: login.text!, passwordEntered: password.text!)
-        print(checkResults)
         if checkResults ?? false {
             #if DEBUG
             let profile: UIViewController = ProfileViewController(fullName: CurrentHipsterCat.user.fullName, userService: CurrentHipsterCat)
