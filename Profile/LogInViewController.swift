@@ -2,6 +2,16 @@ import UIKit
 
 class LogInViewController: UIViewController {
     
+    var loginDelegate: LoginViewControllerDelegate?
+    
+    let alertController: UIAlertController = {
+        let alert = UIAlertController(title: " Неправильный пароль ",
+                                      message: "Вы можете попробовать ввести его снова",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Понятно", style: .default, handler: { _ in }))
+        return alert
+    }()
+    
     let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = true
@@ -18,7 +28,7 @@ class LogInViewController: UIViewController {
         return view
     }()
     
-    let profile: UIViewController = ProfileViewController()
+    //let profile: UIViewController = ProfileViewController(fullName: "Hipster Cat", userService: hipsterCat)
     
     let logoView: UIView = {
         let logoView = UIView()
@@ -27,16 +37,12 @@ class LogInViewController: UIViewController {
         return logoView
     }()
     
-    let logInButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = 10
+    let logInButton: CustomButton = {
+        let button = CustomButton(title: "Log In", titleColor: .white, radius: 10, backgroundColor: .clear)
         button.layer.masksToBounds = true
         button.setBackgroundImage(UIImage(named: "blue_pixel"), for: .normal)
-        button.setTitle("Log In", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.titleLabel?.textColor = .black
-        button.addTarget(self, action: #selector(logIn), for: .touchUpInside)
+        //button.addTarget(self, action: #selector(logIn), for: .touchUpInside)
         return button
     }()
     
@@ -52,6 +58,7 @@ class LogInViewController: UIViewController {
         field.layer.borderWidth = 0.5
         field.layer.borderColor = UIColor.lightGray.cgColor
         field.layer.sublayerTransform = CATransform3DMakeTranslation(8, 0, 0)
+        field.text = ""
         return field
     }()
     
@@ -68,6 +75,7 @@ class LogInViewController: UIViewController {
         field.layer.borderColor = UIColor.lightGray.cgColor
         field.isSecureTextEntry = true
         field.layer.sublayerTransform = CATransform3DMakeTranslation(8, 0, 0)
+        field.text = ""
         return field
     }()
     
@@ -93,12 +101,18 @@ class LogInViewController: UIViewController {
         addSubviews()
         view.addGestureRecognizer(tap)
         layout()
-        
+        setupButton()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.navigationController?.navigationBar.isHidden = true
+    }
+    
+    func setupButton() {
+        logInButton.function = { [weak self] in
+            self?.logIn()
+        }
     }
     
     @objc func dismissKeyboard() {
@@ -114,8 +128,18 @@ class LogInViewController: UIViewController {
 //    }
 // Вариант с проверкой на ввод, оставлю закоменченным
     
-    @objc func logIn() {
-        self.navigationController?.pushViewController(profile, animated: true)
+    func logIn() {
+        let checkResults = loginDelegate?.check(loginEntered: login.text!, passwordEntered: password.text!)
+        if checkResults ?? false {
+            #if DEBUG
+            let profile: UIViewController = ProfileViewController(fullName: CurrentHipsterCat.user.fullName, userService: CurrentHipsterCat)
+            #else
+            let profile: UIViewController = ProfileViewController(fullName: TestUserService.user.fullName, userService: TestUserService)
+            #endif
+            self.navigationController?.pushViewController(profile, animated: true)
+        } else {
+            self.present(alertController, animated: true)
+        }
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {

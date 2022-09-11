@@ -1,6 +1,10 @@
 import UIKit
+import iOSIntPackage
 
 class PhotosViewController: UIViewController {
+    
+    let imageFacade = ImagePublisherFacade()
+    
     
     private enum LayoutConstant {
         static let spacing: CGFloat = 8.0
@@ -14,8 +18,13 @@ class PhotosViewController: UIViewController {
     }()
     
     
-    lazy var photos: [String] = []
-
+    //lazy var photos: [String] = []
+    var imageList: [UIImage] = []
+    //это массив в который я добавляю всё с подписки, то есть фото
+    var imageSendingList: [UIImage] = []
+    //это массив, который полный с 20 фото, его я отправляю
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -29,12 +38,21 @@ class PhotosViewController: UIViewController {
         photosCollection.register(PhotosCollectionViewCell.self, forCellWithReuseIdentifier: PhotosCollectionViewCell.identifier)
         
         for i in 1...20 {
+            // Тут я просто создаю список imageSendingList
             let photoName = "photo" + String(i)
-            photos.append(photoName)
-            print("adding photo")
+            imageSendingList.append(UIImage(named: photoName) ?? UIImage())
+            print(photoName)
         }
+        
+        imageFacade.subscribe(self)
+        imageFacade.addImagesWithTimer(time: 0.5, repeat: 20, userImages: imageSendingList)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            self.imageFacade.removeSubscription(for: self)
+        }
+        //по идее это как раз идеальный момент для отмены подписки, но возможно в идее было что то другое
     }
     
+
     func layout() {
         NSLayoutConstraint.activate([
             photosCollection.topAnchor.constraint(equalTo: view.topAnchor),
@@ -47,12 +65,12 @@ class PhotosViewController: UIViewController {
 
 extension PhotosViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        photos.count
+        imageList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = photosCollection.dequeueReusableCell(withReuseIdentifier: PhotosCollectionViewCell.identifier, for: indexPath) as! PhotosCollectionViewCell
-        let data = photos[indexPath.row]
+        let data = imageList[indexPath.row]
         cell.setup(data)
         return cell
     }
@@ -118,4 +136,12 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout {
             newViewController.setup(photoName)
             navigationController?.pushViewController(newViewController, animated: true)
         }
+}
+
+extension PhotosViewController: ImageLibrarySubscriber {
+    
+    func receive(images: [UIImage]) {
+        imageList = images
+        photosCollection.reloadData()
+    }
 }
