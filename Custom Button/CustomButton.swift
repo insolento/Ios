@@ -6,14 +6,15 @@ class CustomButton: UIButton {
     
     var title: String = ""
     var color: UIColor = UIColor()
-    var function: () -> ()
+    var function: (()->Void)?
     
-    required init(title: String, titleColor: UIColor, completition: @escaping () -> ()) {
-        function = completition
+    required init(title: String, titleColor: UIColor, radius: Int, backgroundColor: UIColor) {
         super.init(frame: .zero)
+        self.layer.cornerRadius = 10
+        self.backgroundColor = backgroundColor
         self.title = title
         self.color = titleColor
-        backgroundColor = .red
+        self.translatesAutoresizingMaskIntoConstraints = false
         setup()
     }
     
@@ -23,11 +24,10 @@ class CustomButton: UIButton {
     
     func setup() {
         self.setTitle("\(title)", for: .normal)
-        self.backgroundColor = color
-        self.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-    }
+        self.setTitleColor(color, for: .normal)
+        self.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)    }
     
     @objc func buttonTapped() {
-        function()
+        function?()
     }
 }

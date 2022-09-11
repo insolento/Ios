@@ -3,6 +3,8 @@ import UIKit
 class FeedViewController: UIViewController {
     let postController = PostViewController()
     
+    let feedModel = FeedModel()
+    
     let passwordTextField: UITextField = {
         let field = UITextField()
         field.translatesAutoresizingMaskIntoConstraints = false
@@ -22,43 +24,34 @@ class FeedViewController: UIViewController {
     }()
     
     
-    let checkButton: UIButton = {
-        let button = CustomButton(title: "Check", titleColor: .blue, completition: {print("Checked Word")})
+    let checkButton: CustomButton = {
+        let button = CustomButton(title: "Check", titleColor: .blue, radius: 10, backgroundColor: .clear)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         button.widthAnchor.constraint(equalToConstant: 230).isActive = true
-        button.layer.cornerRadius = 10
         return button
     }()
     
     
-    
-    let buttonToPost: UIButton = {
-        let buttonToPost = UIButton(type: .system)
+    let buttonToPost: CustomButton = {
+        let buttonToPost = CustomButton(title: "Open Post", titleColor: .blue, radius: 0, backgroundColor: .clear)
+        //let buttonToPost = CustomButton(title: "Open Post", titleColor: .blue, completition: #selector(openPost))
         buttonToPost.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
-        buttonToPost.setTitle("Open Post", for: .normal)
-        buttonToPost.translatesAutoresizingMaskIntoConstraints = false
-        buttonToPost.addTarget(self, action:#selector(openPost), for: .touchUpInside)
         return buttonToPost
     }()
     
-    let secondButton: UIButton = {
-        let secondButton = UIButton(type: .system)
-        secondButton.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
-        secondButton.setTitle("Open Post", for: .normal)
-        secondButton.translatesAutoresizingMaskIntoConstraints = false
-        secondButton.addTarget(self, action:#selector(openPost), for: .touchUpInside)
-        return secondButton
+    let secondButton: CustomButton = {
+        let buttonToPost = CustomButton(title: "Open Post", titleColor: .blue, radius: 0, backgroundColor: .clear)
+        //let buttonToPost = CustomButton(title: "Open Post", titleColor: .blue, completition: #selector(openPost))
+        buttonToPost.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
+        return buttonToPost
     }()
     
-    let thirdButton: UIButton = {
-        let thirdButton = UIButton(type: .system)
-        thirdButton.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
-        thirdButton.setTitle("Open Post", for: .normal)
-        thirdButton.translatesAutoresizingMaskIntoConstraints = false
-        thirdButton.addTarget(self, action:#selector(openPost), for: .touchUpInside)
-        thirdButton.setTitle("Open Post", for: .normal)
-        return thirdButton
+    let thirdButton: CustomButton = {
+        let buttonToPost = CustomButton(title: "Open Post", titleColor: .blue, radius: 0, backgroundColor: .clear)
+        //let buttonToPost = CustomButton(title: "Open Post", titleColor: .blue, completition: #selector(openPost))
+        buttonToPost.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
+        return buttonToPost
     }()
     
     let buttonStackView: UIStackView = {
@@ -71,6 +64,13 @@ class FeedViewController: UIViewController {
         return buttonStackView
     }()
     
+    let coreectnessLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 15)
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -79,19 +79,42 @@ class FeedViewController: UIViewController {
         view.addSubview(buttonStackView)
         view.addSubview(passwordTextField)
         view.addSubview(checkButton)
+        view.addSubview(coreectnessLabel)
         layout()
+        buttonsFunctions()
+        NotificationCenter.default.addObserver(self, selector: #selector(wrongWord), name: .wrongWordEvent, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(rightWord), name: .rightWordEvent, object: nil)
+    }
+    
+    func buttonsFunctions() {
+        checkButton.function = { [weak self] in
+            self?.feedModel.check(self?.passwordTextField.text ?? "")
+        }
+        buttonToPost.function = { [weak self] in
+            self?.openPost()
+        }
+        secondButton.function = { [weak self] in
+            self?.openPost()
+        }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(<#T##@objc method#>), name: <#T##NSNotification.Name?#>, object: <#T##Any?#>)
+        thirdButton.function = { [weak self] in
+            self?.openPost()
+        }
     }
     
     @objc func openPost() {
         self.navigationController?.pushViewController(postController, animated: true)
     }
     
-    @objc func checkWord() {
-        
+    @objc func wrongWord() {
+        coreectnessLabel.text = "Слово неверное"
+        coreectnessLabel.textColor = .red
     }
     
+    @objc func rightWord() {
+        coreectnessLabel.text = "Слово верное"
+        coreectnessLabel.textColor = .green
+    }
 
     func stackAddSubviews() {
         buttonStackView.addArrangedSubview(buttonToPost)
@@ -109,11 +132,14 @@ class FeedViewController: UIViewController {
             passwordTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             checkButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 16),
             checkButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            coreectnessLabel.topAnchor.constraint(equalTo: checkButton.bottomAnchor, constant: 16),
+            coreectnessLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }
 }
 
 extension NSNotification.Name {
-    static let wordEvent = NSNotification.Name("wordEvent")
+    static let wrongWordEvent = NSNotification.Name("wrongWord")
+    static let rightWordEvent = NSNotification.Name("rightWord")
 }
 
