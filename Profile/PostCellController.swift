@@ -60,6 +60,7 @@ class PostCellController: UITableViewCell {
     }
     
     public func filter(_ image: UIImage) -> UIImage {
+<<<<<<< HEAD
         var actualPhoto = image
         let imageProcessor = ImageProcessor()
         let filters: [ColorFilter] = [.colorInvert, .fade, .chrome, .noir]
@@ -68,11 +69,24 @@ class PostCellController: UITableViewCell {
         return actualPhoto
     }
 
+=======
+         var actualPhoto = image
+         let imageProcessor = ImageProcessor()
+         let filters: [ColorFilter] = [.colorInvert, .fade, .chrome, .noir]
+         let filter: ColorFilter = filters.randomElement() ?? .fade
+         imageProcessor.processImage(sourceImage: actualPhoto , filter: filter) { filteredImage in actualPhoto = filteredImage ?? UIImage()}
+         return actualPhoto
+     }
+>>>>>>> iosint-3
     
     public func update(author: String, description: String, image: String, likes: Int, views: Int) {    
         postTitle.text = author
         postDescription.text = description
+<<<<<<< HEAD
         postImage.image = filter(UIImage(named: image) ?? UIImage())
+=======
+        postImage.image =  filter(UIImage(named: image) ?? UIImage())
+>>>>>>> iosint-3
         postLikes.text = "Likes:" + String(likes)
         postViews.text = "Views:" + String(views)
     }
